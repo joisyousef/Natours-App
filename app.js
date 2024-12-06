@@ -9,8 +9,7 @@ let tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`, 'utf-8')
 );
 
-// GET route to retrieve all tours
-app.get('/api/v1/tours', (req, res) => {
+const getAllTours = (req, res) => {
   res.status(200).json({
     status: 'success',
     result: tours.length,
@@ -18,9 +17,8 @@ app.get('/api/v1/tours', (req, res) => {
       tours,
     },
   });
-});
-// GET route to retrieve a single tour
-app.get('/api/v1/tours/:id', (req, res) => {
+};
+const getTour = (req, res) => {
   console.log(req.params);
 
   const id = req.params.id * 1;
@@ -39,9 +37,8 @@ app.get('/api/v1/tours/:id', (req, res) => {
       tour,
     },
   });
-});
-// POST route to add a new tour
-app.post('/api/v1/tours', (req, res) => {
+};
+const createTour = (req, res) => {
   const newId = tours.length > 0 ? tours[tours.length - 1].id + 1 : 1; // Handle case when array is empty
   const newTour = Object.assign({ id: newId }, req.body);
 
@@ -67,9 +64,8 @@ app.post('/api/v1/tours', (req, res) => {
       });
     }
   );
-});
-// PATCH route to update a certian tour
-app.patch('/api/v1/tours/:id', (req, res) => {
+};
+const updateTour = (req, res) => {
   if (req.params.id * 1 > tours.length)
     return res.status(404).json({
       status: 'Fail',
@@ -80,21 +76,31 @@ app.patch('/api/v1/tours/:id', (req, res) => {
     status: 'success',
     data: null,
   });
-});
+};
+const deleteTour = (req, res) => {
+  if (req.params.id * 1 > tours.length)
+    return res.status(404).json({
+      status: 'Fail',
+      message: 'Invalid ID',
+    });
+
+  res.status(204).json({
+    status: 'success',
+    data: null,
+  });
+};
+// GET route to retrieve all tours
+app.get('/api/v1/tours', getAllTours);
+
+// GET route to retrieve a single tour
+app.get('/api/v1/tours/:id', getTour);
+// POST route to add a new tour
+app.post('/api/v1/tours', createTour);
+// PATCH route to update a certian tour
+app.patch('/api/v1/tours/:id', updateTour);
 
 // DELETE route to delete certian tour
-app.delete('/api/v1/tours/:id', (req, res) => {
-  if (req.params.id * 1 > tours.length)
-    return res.status(404).json({
-      status: 'Fail',
-      message: 'Invalid ID',
-    });
-
-  res.status(204).json({
-    status: 'success',
-    data: null,
-  });
-});
+app.delete('/api/v1/tours/:id', deleteTour);
 
 // Start the server
 const port = 3000;

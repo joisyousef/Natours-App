@@ -33,7 +33,6 @@ app.get('/api/v1/tours/:id', (req, res) => {
       message: 'Invalid ID',
     });
   }
-
   res.status(200).json({
     status: 'success',
     data: {
@@ -68,6 +67,19 @@ app.post('/api/v1/tours', (req, res) => {
       });
     }
   );
+});
+// DELETE route to delete certian tour
+app.delete('/api/v1/tours/:id', (req, res) => {
+  if (req.params.id * 1 > tours.length)
+    return res.status(404).json({
+      status: 'Fail',
+      message: 'Invalid ID',
+    });
+
+  res.status(204).json({
+    status: 'success',
+    data: null,
+  });
 });
 
 // Start the server

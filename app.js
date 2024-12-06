@@ -89,18 +89,18 @@ const deleteTour = (req, res) => {
     data: null,
   });
 };
-// GET route to retrieve all tours
-app.get('/api/v1/tours', getAllTours);
+// app.get('/api/v1/tours', getAllTours);
+// app.get('/api/v1/tours/:id', getTour);
+// app.post('/api/v1/tours', createTour);
+// app.patch('/api/v1/tours/:id', updateTour);
+// app.delete('/api/v1/tours/:id', deleteTour);
 
-// GET route to retrieve a single tour
-app.get('/api/v1/tours/:id', getTour);
-// POST route to add a new tour
-app.post('/api/v1/tours', createTour);
-// PATCH route to update a certian tour
-app.patch('/api/v1/tours/:id', updateTour);
-
-// DELETE route to delete certian tour
-app.delete('/api/v1/tours/:id', deleteTour);
+app.route('/api/v1/tours').get(getAllTours).post(createTour);
+app
+  .route('/api/v1/tours/:id')
+  .get(getTour)
+  .patch(updateTour)
+  .delete(deleteTour);
 
 // Start the server
 const port = 3000;

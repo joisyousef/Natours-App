@@ -4,21 +4,22 @@
   "description": "Learning node, express and mongoDB\t",
   "main": "app.js",
   "scripts": {
-    "start:dev": "nodemon server.js",
+    "start": "nodemon server.js",
     "start:prod": "NODE_ENV=production nodemon server.js"
   },
   "author": "Yousef Elsrogy",
   "license": "ISC",
   "dependencies": {
     "dotenv": "^16.4.7",
+    "eslint-config-airbnb": "^19.0.4",
     "express": "^4.21.1",
+    "mongoose": "^8.8.4",
     "morgan": "^1.10.0"
   },
   "devDependencies": {
     "@eslint/config-array": "^0.19.1",
     "@eslint/object-schema": "^2.1.5",
-    "eslint": "^9.16.0",
-    "eslint-config-airbnb": "^19.0.4",
+    "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",

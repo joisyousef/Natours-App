@@ -1,61 +1,85 @@
 const fs = require('fs');
+const path = require('path');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const Tour = require('./../../models/tourModel');
-// const Review = require('./../../models/reviewModel');
-// const User = require('./../../models/userModel');
+const Tour = require('../../models/tourModel');
 
-dotenv.config({ path: './config.env' });
+// Load environment variables
+dotenv.config({ path: path.join(__dirname, '../../.env') });
 
+// Validate environment variables
+if (!process.env.DATABASE || !process.env.DATABASE_PASSWORD) {
+  console.error('Error: Missing required environment variables.');
+  process.exit(1);
+}
+
+// Replace password in database URL
 const DB = process.env.DATABASE.replace(
   '<PASSWORD>',
   process.env.DATABASE_PASSWORD,
 );
 
 // Connect to MongoDB
-mongoose
-  .connect(DB)
-  // .connect(process.env.DATABASE_LOCAL)
-  .then(() => {
+const connectDB = async () => {
+  try {
+    await mongoose.connect(DB);
     console.log('DB Connection Successful');
-  })
-  .catch((err) => {
-    console.error('DB Connection Error:', err);
-  });
+  } catch (err) {
+    console.error('DB Connection Error:', err.message);
+    process.exit(1);
+  }
+};
+connectDB();
 
-// READ JSON FILE
-const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours.json`, 'utf-8'));
-const users = JSON.parse(fs.readFileSync(`${__dirname}/users.json`, 'utf-8'));
-const reviews = JSON.parse(
-  fs.readFileSync(`${__dirname}/reviews.json`, 'utf-8'),
-);
+// Read JSON files
+let tours;
+try {
+  tours = JSON.parse(
+    fs.readFileSync(path.join(__dirname, 'tours.json'), 'utf-8'),
+  );
+} catch (err) {
+  console.error('Error reading JSON file:', err.message);
+  process.exit(1);
+}
 
-// IMPORT DATA INTO DB
+// Import data into DB
 const importData = async () => {
   try {
-    await Tour.create(tours);
-    await User.create(users, { validateBeforeSave: false });
-    await Review.create(reviews);
-    console.log('Data successfully loaded!');
+    if (!Array.isArray(tours) || tours.length === 0) {
+      throw new Error('Tours data is invalid or empty.');
+    }
+    const createdTours = await Tour.create(tours);
+    console.log(
+      `Data successfully loaded! Imported ${createdTours.length} tours.`,
+    );
   } catch (err) {
-    console.log(err);
+    console.error('Error importing data:', err.message);
+  } finally {
+    exitProcess();
   }
-  process.exit();
 };
 
-// DELETE ALL DATA FROM DB
+// Delete all data from DB
 const deleteData = async () => {
   try {
-    await Tour.deleteMany();
-    await User.deleteMany();
-    await Review.deleteMany();
-    console.log('Data successfully deleted!');
+    const result = await Tour.deleteMany();
+    console.log(
+      `Data successfully deleted! Removed ${result.deletedCount} records.`,
+    );
   } catch (err) {
-    console.log(err);
+    console.error('Error deleting data:', err.message);
+  } finally {
+    exitProcess();
   }
+};
+
+// Graceful process exit
+const exitProcess = async () => {
+  await mongoose.disconnect();
   process.exit();
 };
 
+// Check command-line arguments
 if (process.argv[2] === '--import') {
   importData();
 } else if (process.argv[2] === '--delete') {

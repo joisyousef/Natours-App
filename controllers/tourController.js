@@ -1,4 +1,5 @@
 // eslint-disable-next-line import/no-useless-path-segments
+const { query } = require('express');
 const Tour = require('./../models/tourModel');
 
 // const tours = JSON.parse(
@@ -26,15 +27,19 @@ const Tour = require('./../models/tourModel');
 
 exports.getAllTours = async (req, res) => {
   try {
-    console.log(req.query);
+    const queryObj = { ...req.query };
+    const excludeFields = ['sort', 'fields', 'limit', 'page'];
+    excludeFields.forEach((el) => delete queryObj[el]);
 
-    const tours = await Tour.find(req.query);
+    const query = await Tour.find(queryObj);
 
-    // const tours = await Tour.find()
+    // const query = Tour.find()
     //   .where('duration')
     //   .equals(5)
     //   .where('difficulty')
     //   .equals('easy');
+
+    const tours = await query;
 
     res.status(200).json({
       status: 'success',

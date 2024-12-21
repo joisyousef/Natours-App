@@ -1,10 +1,11 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+
+dotenv.config({ path: './.env' });
 const app = require('./app');
-const { type } = require('superagent/lib/utils');
+// const { type } = require('superagent/lib/utils');
 
 // Load environment variables
-dotenv.config({ path: './.env' });
 
 const DB = process.env.DATABASE.replace(
   '<PASSWORD>',

@@ -33,11 +33,11 @@ exports.getAllTours = async (req, res) => {
 
     const query = await Tour.find(queryObj);
 
-    // const query = Tour.find()
-    //   .where('duration')
-    //   .equals(5)
-    //   .where('difficulty')
-    //   .equals('easy');
+    const query = Tour.find()
+      .where('duration')
+      .equals(5)
+      .where('difficulty')
+      .equals('easy');
 
     const tours = await query;
 

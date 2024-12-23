@@ -2,29 +2,6 @@
 const { query } = require('express');
 const Tour = require('./../models/tourModel');
 
-// const tours = JSON.parse(
-//   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`, 'utf-8'),
-// );       was for testing
-// exports.checkID = (req, res, next, val) => {
-//   console.log(`Tour id is ${val}`);
-//   if (req.params.id * 1 > tours.length)
-//     return res.status(404).json({
-//       status: 'Fail',
-//       message: 'Invalid ID',
-//     });
-//   next();
-// };     was for testing middleware functionality
-
-// exports.checkBody = (req, res, next) => {
-//   if (!req.body.name || !req.body.price) {
-//     return res.status(400).json({
-//       status: 'Fail',
-//       message: 'Missing name or price in request body',
-//     });
-//   }
-//   next();
-// };
-
 exports.getAllTours = async (req, res) => {
   try {
     console.log(req.query);

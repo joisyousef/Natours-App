@@ -3,10 +3,8 @@ const dotenv = require('dotenv');
 
 dotenv.config({ path: './.env' });
 const app = require('./app');
-// const { type } = require('superagent/lib/utils');
 
 // Load environment variables
-
 const DB = process.env.DATABASE.replace(
   '<PASSWORD>',
   process.env.DATABASE_PASSWORD,

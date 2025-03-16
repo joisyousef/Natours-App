@@ -7,10 +7,22 @@ const sendErrorDev = (err, res) => {
   });
 };
 const sendErrorProd = (err, res) => {
-  res.status(err.statusCode).json({
-    status: err.status,
-    message: err.message,
-  });
+  // Operational, Treusted error: send message to client
+  if (err.isOperational) {
+    res.status(err.statusCode).json({
+      status: err.status,
+      message: err.message,
+    });
+    // Proggramming or other unknown error: don't leak error details
+  } else {
+    // 1) Log Error
+    console.error('ERROR', err);
+    // 2) Send Generic Message
+    res.status(500).json({
+      status: 'error',
+      message: 'something went very wrong!',
+    });
+  }
 };
 module.exports = (err, req, res, next) => {
   // console.log(err.stack);

@@ -13,6 +13,13 @@ const sendErrorDev = (err, res) => {
     stack: err.stack,
   });
 };
+const handleDuplicateFieldDB = (err) => {
+  const value = err.errmsg.match(/(["'])(\\?.)*?\1/)[0];
+  console.log(value);
+
+  const message = `Duplicate Field Value: ${value}. Please Use Another Value!`;
+  return new AppError(message, 400);
+};
 const sendErrorProd = (err, res) => {
   // Operational, Treusted error: send message to client
   if (err.isOperational) {
@@ -42,6 +49,7 @@ module.exports = (err, req, res, next) => {
   } else if (process.env.NODE_ENV === 'production') {
     let error = { ...err };
     if (error.name === 'CastError') error = handleCastErrorDB(error);
+    if (error.code === 11000) error = handleDuplicateFieldDB(error);
 
     sendErrorProd(error, res);
   }

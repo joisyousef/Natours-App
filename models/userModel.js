@@ -28,13 +28,16 @@ const userSchema = new mongoose.Schema({
     required: [true, 'Please confirm your password'],
     validate: {
       validator: function (el) {
-        return el === this.password; // abc === abc
-        // This only works on CREATE and SAVE!
+        return el === this.password;
       },
       message: 'Passwords do not match',
     },
+    select: false, // Don't include in queries
   },
-  passwordChangedAt: Date,
+  passwordChangedAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 // Middleware to hash password before saving
@@ -50,6 +53,15 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
+// Middleware to set passwordChangedAt when password is modified
+userSchema.pre('save', function (next) {
+  if (!this.isModified('password') || this.isNew) return next();
+
+  // Set passwordChangedAt to 1 second in the past to ensure JWT is created after password change
+  this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
+
 // Method to check if the provided password is correct
 userSchema.methods.correctPassword = async function (
   candidatePassword,
@@ -58,10 +70,12 @@ userSchema.methods.correctPassword = async function (
   return await bcrypt.compare(candidatePassword, userPassword);
 };
 
-userSchema.methods.changePasswordAfter = function (JWTTimestamp) {
+userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   if (this.passwordChangedAt) {
-    const changedTimestamp = parseInt(this.passwordChangedAt.getTime() / 1000); // Convert to seconds
-    console.log(changedTimestamp, JWTTimestamp);
+    const changedTimestamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10,
+    );
     return JWTTimestamp < changedTimestamp;
   }
   // False means NOT changed

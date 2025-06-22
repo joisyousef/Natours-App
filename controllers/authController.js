@@ -10,14 +10,31 @@ const signToken = (id) =>
   });
 
 exports.signup = catchAsync(async (req, res, next) => {
+  const { name, email, password, passwordConfirm, role } = req.body;
+  
+  // Add validation
+  if (!name || !email || !password || !passwordConfirm) {
+    return next(new AppError('Please provide all required fields!', 400));
+  }
+
+  // Log the incoming role for debugging
+  console.log('Incoming role:', role);
+
   const newUser = await User.create({
-    name: req.body.name,
-    email: req.body.email,
-    password: req.body.password,
-    passwordConfirm: req.body.passwordConfirm,
+    name,
+    email,
+    password,
+    passwordConfirm,
+    role: role || 'user', // Make sure role is included
   });
 
+  // Log the created user's role for debugging
+  console.log('Created user role:', newUser.role);
+
   const token = signToken(newUser._id);
+  
+  // Remove password from output
+  newUser.password = undefined;
 
   res.status(201).json({
     status: 'success',
@@ -90,3 +107,16 @@ exports.protect = catchAsync(async (req, res, next) => {
   req.user = freshUser;
   next();
 });
+
+// Middleware to restrict access to certain roles
+exports.restrictTo =
+  (...roles) =>
+  (req, res, next) => {
+    // roles is an array, ['admin', 'lead-guide']. role = 'user'
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError('You do not have permission to perform this action.', 403),
+      );
+    }
+    next();
+  };

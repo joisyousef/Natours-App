@@ -94,17 +94,14 @@ userSchema.methods.createPasswordResetToken = function () {
   const resetToken = crypto.randomBytes(32).toString('hex');
 
   // Hash the token and set it on the user document
-  crypto.createHash('sha256').update(resetToken).digest('hex');
-
-  // Set the password reset token and its expiration time
-  this.changedPasswordAfter = crypto
+  this.passwordResetToken = crypto
     .createHash('sha256')
     .update(resetToken)
     .digest('hex');
 
-  console.log({ resetToken }, this.changedPasswordAfter);
+  console.log({ resetToken }, this.passwordResetToken);
 
-  // Set the reset token and its expiration time
+  // Set the reset token expiration time
   this.passwordResetExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
 
   return resetToken; // Return the plain token to send to the user

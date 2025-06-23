@@ -11,7 +11,7 @@ const signToken = (id) =>
 
 exports.signup = catchAsync(async (req, res, next) => {
   const { name, email, password, passwordConfirm, role } = req.body;
-  
+
   // Add validation
   if (!name || !email || !password || !passwordConfirm) {
     return next(new AppError('Please provide all required fields!', 400));
@@ -32,7 +32,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   console.log('Created user role:', newUser.role);
 
   const token = signToken(newUser._id);
-  
+
   // Remove password from output
   newUser.password = undefined;
 
@@ -120,3 +120,9 @@ exports.restrictTo =
     }
     next();
   };
+
+// Middleware to forgot password
+exports.forgotPassword = catchAsync(async (req, res, next) =>{}
+)
+exports.resetPassword = catchAsync(async (req, res, next) => {})
+

@@ -20,6 +20,6 @@ const sendEmail = async (options) => {
     // html: options.html, // Uncomment if you want to send HTML emails
   };
   // 3) Send the email
-  transporter.sendmail(mailOptions);
+  transporter.sendMail(mailOptions);
 };
 module.exports = sendEmail;

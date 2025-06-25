@@ -1,17 +1,12 @@
 const nodeMailer = require('nodemailer');
 
 const sendEmail = async (options) => {
-  console.log('📧 Creating email transporter...');
-
   let transporter;
 
   if (process.env.NODE_ENV === 'development') {
     // Use Ethereal Email for development (creates test account automatically)
-    console.log('🔧 Using Ethereal Email for development...');
-
     try {
       const testAccount = await nodeMailer.createTestAccount();
-      console.log('✅ Test account created:', testAccount.user);
 
       transporter = nodeMailer.createTransport({
         host: 'smtp.ethereal.email',
@@ -23,7 +18,6 @@ const sendEmail = async (options) => {
         },
       });
     } catch (error) {
-      console.error('❌ Failed to create Ethereal test account:', error);
       throw error;
     }
   } else {
@@ -38,7 +32,7 @@ const sendEmail = async (options) => {
     });
   }
 
-  // 2) Define the email options
+  // Define the email options
   const mailOptions = {
     from: 'Yousef Elsrogy <noreply@natours.com>',
     to: options.email,
@@ -46,22 +40,12 @@ const sendEmail = async (options) => {
     text: options.message,
   };
 
-  console.log('📧 Sending email to:', options.email);
-
   try {
-    // 3) Send the email
+    // Send the email
     const result = await transporter.sendMail(mailOptions);
-    console.log('✅ Email sent successfully!');
-    console.log('Message ID:', result.messageId);
-
-    // Show preview URL for development
-    if (process.env.NODE_ENV === 'development') {
-      console.log('🔗 Preview URL:', nodeMailer.getTestMessageUrl(result));
-    }
 
     return result;
   } catch (error) {
-    console.error('❌ Email sending failed:', error);
     throw error;
   }
 };
